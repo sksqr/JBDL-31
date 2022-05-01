@@ -1,0 +1,30 @@
+
+/*
+<Addresss>
+<street>Street 123</street>
+<city>Delhi</city>
+<value type="int">1</value>
+</Address>
+========
+{
+"street":"Street 123",
+"city":"Delhi"
+"value":1
+}
+
+===
+
+
+=========
+Client and Server are already aware.
+1 line: Street
+2 line: city
+
+protobuf
+gRPC
+
+"Street 123"
+"Delhi"
+
+
+ */
