@@ -14,6 +14,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -32,18 +33,25 @@ public class TransactionService {
 
     private String transactionInitTopic = "TRANSACTION_INIT";
 
-    public Long doTransaction(TransactionRequestDTO transactionRequestDTO) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public String doTransaction(TransactionRequestDTO transactionRequestDTO) throws JsonProcessingException, ExecutionException, InterruptedException {
         Transaction transaction = Transaction.builder()
                 .fromUserId(transactionRequestDTO.getFromUserId())
                 .toUserId(transactionRequestDTO.getToUserId())
                 .amount(transactionRequestDTO.getAmount())
                 .status(TransactionStatus.PENDING)
+                .txnId(UUID.randomUUID().toString())
                 .build();
         transactionRepo.save(transaction);
         String payload = objectMapper.writeValueAsString(transaction);
         ListenableFuture<SendResult<String, String>> kafkaResponseFuture =  kafkaTemplate.send(transactionInitTopic, String.valueOf(transaction.getFromUserId()),payload);
 
         logger.info("Pushed to topic: {}, kafka resposne :{}",transactionInitTopic, kafkaResponseFuture.get());
-        return transaction.getId();
+        return transaction.getTxnId();
+    }
+
+
+    public String checkStatus(String txnId){
+        Transaction transaction = transactionRepo.findByTxnId(txnId);
+        return transaction.getStatus().name();
     }
 }

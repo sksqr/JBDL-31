@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gfg.transactionservice.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.ExecutionException;
 
@@ -19,8 +16,13 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @PostMapping
-    public ResponseEntity<Long> doTransaction(@RequestBody TransactionRequestDTO transactionRequestDTO) throws ExecutionException, JsonProcessingException, InterruptedException {
-        Long transactionId = transactionService.doTransaction(transactionRequestDTO);
+    public ResponseEntity<String> doTransaction(@RequestBody TransactionRequestDTO transactionRequestDTO) throws ExecutionException, JsonProcessingException, InterruptedException {
+        String transactionId = transactionService.doTransaction(transactionRequestDTO);
         return ResponseEntity.ok(transactionId);
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<String> checkStatus(@RequestParam String txnId){
+        return ResponseEntity.ok(transactionService.checkStatus(txnId));
     }
 }
